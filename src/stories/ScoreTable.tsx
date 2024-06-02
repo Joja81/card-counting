@@ -1,5 +1,5 @@
-import { Game } from '@/games/Game';
-import { Player } from '@/games/Player';
+
+import { Score } from '@/games/Score';
 import {
   Paper,
   Table,
@@ -11,23 +11,24 @@ import {
 } from '@mui/material';
 
 interface ScoreTableProps {
-  game: Game;
+  scores: Score[][];
+  names: string[];
 }
 
-export const ScoreTable: React.FC<ScoreTableProps> = ({ game }) => {
+export const ScoreTable: React.FC<ScoreTableProps> = ({ scores, names }) => {
   return (
     <TableContainer component={Paper}>
       <Table>
         <TableHead>
           <TableRow>
-            {game.players.map((player) => playerCell(player))}
+            {names.map((player, i) => playerCell(player, scores.map((s) => s[i])))}
           </TableRow>
         </TableHead>
         <TableBody>
-          {game.getScores().map((roundScores, i) => (
-            <TableRow key={i}>
-              {roundScores.map((score, j) => (
-                <TableCell key={j}>{score.getScoreTableCell()}</TableCell>
+          {scores.map((playerScores, i) => (
+            <TableRow key={`scores-${i}`}>
+              {playerScores.map((score, j) => (
+                <TableCell key={`score-${i}-${j}`}>{score.getScore()}</TableCell>
               ))}
             </TableRow>
           ))}
@@ -37,10 +38,12 @@ export const ScoreTable: React.FC<ScoreTableProps> = ({ game }) => {
   );
 };
 
-const playerCell = (player: Player) => {
+const playerCell = (name: string, scores: Score[]) => {
+  const score = scores.reduce((acc, score) => acc + score.getScore(), 0);
+
   return (
-    <TableCell>
-      {player.name}: {player.getScore()}
+    <TableCell key={`player-${name}-${score}`}>
+      {name}: {score}
     </TableCell>
   );
 };
